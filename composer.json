@@ -24,6 +24,7 @@
 
         "webmozart/assert": "^1.1",
         "sylius/resource": "dev-laravel-v5",
+        "illuminate/database": "^v5.4",
         "zendframework/zend-stdlib": "^3.1"
     },
     "require-dev": {
@@ -44,6 +45,10 @@
         {
             "type": "path",
             "url": "../../*/*"
+        },
+        {
+            "type": "vcs",
+            "url": "git@github.com:sismutmx/laravel-sylius-resource-component.git"
         }
     ],
     "extra": {

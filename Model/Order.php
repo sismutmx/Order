@@ -13,60 +13,12 @@ declare(strict_types=1);
 
 namespace Sylius\Component\Order\Model;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use Illuminate\Database\Eloquent\Collection;
 use Sylius\Component\Resource\Model\TimestampableTrait;
 
-class Order implements OrderInterface
+class Order extends implements OrderInterface
 {
     use TimestampableTrait;
-
-    /**
-     * @var mixed
-     */
-    protected $id;
-
-    /**
-     * @var \DateTimeInterface|null
-     */
-    protected $checkoutCompletedAt;
-
-    /**
-     * @var string|null
-     */
-    protected $number;
-
-    /**
-     * @var string|null
-     */
-    protected $notes;
-
-    /**
-     * @var Collection|OrderItemInterface[]
-     */
-    protected $items;
-
-    /**
-     * @var int
-     */
-    protected $itemsTotal = 0;
-
-    /**
-     * @var Collection|AdjustmentInterface[]
-     */
-    protected $adjustments;
-
-    /**
-     * @var int
-     */
-    protected $adjustmentsTotal = 0;
-
-    /**
-     * Items total + adjustments total.
-     *
-     * @var int
-     */
-    protected $total = 0;
 
     /**
      * @var string
@@ -75,9 +27,7 @@ class Order implements OrderInterface
 
     public function __construct()
     {
-        $this->items = new ArrayCollection();
-        $this->adjustments = new ArrayCollection();
-        $this->createdAt = new \DateTime();
+        $this->created_at = new \DateTime();
     }
 
     /**
@@ -93,7 +43,7 @@ class Order implements OrderInterface
      */
     public function getCheckoutCompletedAt(): ?\DateTimeInterface
     {
-        return $this->checkoutCompletedAt;
+        return $this->checkout_completed_at;
     }
 
     /**
@@ -101,7 +51,7 @@ class Order implements OrderInterface
      */
     public function setCheckoutCompletedAt(?\DateTimeInterface $checkoutCompletedAt): void
     {
-        $this->checkoutCompletedAt = $checkoutCompletedAt;
+        $this->checkout_completed_at = $checkoutCompletedAt;
     }
 
     /**
@@ -109,7 +59,7 @@ class Order implements OrderInterface
      */
     public function isCheckoutCompleted(): bool
     {
-        return null !== $this->checkoutCompletedAt;
+        return null !== $this->checkout_completed_at;
     }
 
     /**
@@ -117,7 +67,7 @@ class Order implements OrderInterface
      */
     public function completeCheckout(): void
     {
-        $this->checkoutCompletedAt = new \DateTime();
+        $this->checkout_completed_at = new \DateTime();
     }
 
     /**
@@ -187,7 +137,7 @@ class Order implements OrderInterface
             return;
         }
 
-        $this->itemsTotal += $item->getTotal();
+        $this->items_total += $item->getTotal();
         $this->items->add($item);
         $item->setOrder($this);
 
@@ -220,7 +170,7 @@ class Order implements OrderInterface
      */
     public function getItemsTotal(): int
     {
-        return $this->itemsTotal;
+        return $this->items_total;
     }
 
     /**
@@ -228,9 +178,9 @@ class Order implements OrderInterface
      */
     public function recalculateItemsTotal(): void
     {
-        $this->itemsTotal = 0;
+        $this->items_total = 0;
         foreach ($this->items as $item) {
-            $this->itemsTotal += $item->getTotal();
+            $this->items_total += $item->getTotal();
         }
 
         $this->recalculateTotal();
@@ -349,7 +299,7 @@ class Order implements OrderInterface
     public function getAdjustmentsTotal(?string $type = null): int
     {
         if (null === $type) {
-            return $this->adjustmentsTotal;
+            return $this->adjustments_total;
         }
 
         $total = 0;
@@ -407,11 +357,11 @@ class Order implements OrderInterface
      */
     public function recalculateAdjustmentsTotal(): void
     {
-        $this->adjustmentsTotal = 0;
+        $this->adjustments_total = 0;
 
         foreach ($this->adjustments as $adjustment) {
             if (!$adjustment->isNeutral()) {
-                $this->adjustmentsTotal += $adjustment->getAmount();
+                $this->adjustments_total += $adjustment->getAmount();
             }
         }
 
@@ -423,7 +373,7 @@ class Order implements OrderInterface
      */
     protected function recalculateTotal(): void
     {
-        $this->total = $this->itemsTotal + $this->adjustmentsTotal;
+        $this->total = $this->items_total + $this->adjustments_total;
 
         if ($this->total < 0) {
             $this->total = 0;
@@ -436,7 +386,7 @@ class Order implements OrderInterface
     protected function addToAdjustmentsTotal(AdjustmentInterface $adjustment): void
     {
         if (!$adjustment->isNeutral()) {
-            $this->adjustmentsTotal += $adjustment->getAmount();
+            $this->adjustments_total += $adjustment->getAmount();
             $this->recalculateTotal();
         }
     }
@@ -447,7 +397,7 @@ class Order implements OrderInterface
     protected function subtractFromAdjustmentsTotal(AdjustmentInterface $adjustment): void
     {
         if (!$adjustment->isNeutral()) {
-            $this->adjustmentsTotal -= $adjustment->getAmount();
+            $this->adjustments_total -= $adjustment->getAmount();
             $this->recalculateTotal();
         }
     }
