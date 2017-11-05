@@ -14,9 +14,10 @@ declare(strict_types=1);
 namespace Sylius\Component\Order\Model;
 
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Sylius\Component\Resource\Model\TimestampableTrait;
 
-class Order extends implements OrderInterface
+class Order extends Model implements OrderInterface
 {
     use TimestampableTrait;
 
@@ -24,11 +25,6 @@ class Order extends implements OrderInterface
      * @var string
      */
     protected $state = OrderInterface::STATE_CART;
-
-    public function __construct()
-    {
-        $this->created_at = new \DateTime();
-    }
 
     /**
      * {@inheritdoc}
